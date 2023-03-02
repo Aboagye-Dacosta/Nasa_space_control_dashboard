@@ -1,8 +1,8 @@
-const path = require("path");
 const { getAllHabitablePlanets } = require("../../model/planets.model");
 
-function httpGetAllPlanets(req, res) {
-  return res.status(200).json(getAllHabitablePlanets());
+async function httpGetAllPlanets(req, res) {
+  const response = await getAllHabitablePlanets();
+  return res.status(200).json(response);
 }
 
 module.exports = {
