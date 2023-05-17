@@ -4,15 +4,18 @@ const {
   getNewLaunchKeys,
   abortLaunchById,
   existLaunchWithId,
+  getLaunchById,
 } = require("../../model/launches.model");
 
+const { getPagination, getSort } = require("../../services/query");
 
 //Todo: getting all launches from mongodb
 async function httpGetAllLaunches(req, res) {
-  const launches = await getAllLaunches();
+  const sort = getSort(req.query);
+  const { skip, limit } = getPagination(req.query);
+  const launches = await getAllLaunches(skip, limit, sort);
   return res.status(200).json(launches);
 }
-
 
 //Todo: adding new launch to mongodb
 async function httpAddNewLaunch(req, res) {
@@ -46,7 +49,7 @@ async function httpAddNewLaunch(req, res) {
 
   // converting the launch date to a valid date
   launch.launchDate = new Date(launch.launchDate);
-  return res.status(201).json( await addNewLaunch(launch));
+  return res.status(201).json(await addNewLaunch(launch));
 }
 
 //Todo: aborting launch by id
@@ -62,8 +65,21 @@ async function httpAbortLaunch(req, res) {
   res.status(200).json(aborted);
 }
 
+async function httpGetLaunchById(req, res) {
+  const launchId = Number(req.params.id);
+
+  if (!(await existLaunchWithId(launchId)))
+    return res.status(404).json({
+      error: "launch not found",
+    });
+
+  const launch = await getLaunchById(launchId);
+  res.status(200).json(launch);
+}
+
 module.exports = {
   httpGetAllLaunches,
   httpAddNewLaunch,
   httpAbortLaunch,
+  httpGetLaunchById,
 };

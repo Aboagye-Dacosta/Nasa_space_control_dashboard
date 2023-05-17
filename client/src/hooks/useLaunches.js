@@ -32,6 +32,7 @@ function useLaunches(onSuccessSound, onAbortSound, onFailureSound) {
       });
 
       const success = response.ok;
+      
       if (success) {
         getLaunches();
         setTimeout(() => {

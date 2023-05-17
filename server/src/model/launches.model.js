@@ -60,10 +60,15 @@ async function findLaunch(filter) {
 
 //Todo:  reading all launches from mongodb
 //Todo: calls findLaunches function
-async function readLaunches() {
+async function readLaunches(skip, limit, sort) {
+  console.log("sort", sort);
   let data = [];
   try {
-    data = await findLaunch({});
+    data = await launches
+      .find({}, { _id: 0, __v: 0 })
+      .skip(skip)
+      .limit(limit)
+      .sort({ flightNumber: sort });
   } catch (error) {
     console.error(`Sorry could not get all launches: ${error}`);
   }
@@ -116,8 +121,8 @@ async function abortLaunchById(id) {
 
 //Todo: getting all launches from mongodb
 //Todo: calls readLaunches function
-async function getAllLaunches() {
-  const allLaunches = await readLaunches();
+async function getAllLaunches(skip, limit, sort) {
+  const allLaunches = await readLaunches(skip, limit, sort);
   return allLaunches;
 }
 
@@ -186,6 +191,11 @@ async function loadLaunchesData() {
   await spacexLaunches();
 }
 
+async function getLaunchById(id) {
+  const launch = await findLaunch({ flightNumber: id });
+  return launch;
+}
+
 function getNewLaunchKeys() {
   return ["mission", "rocket", "target", "launchDate"];
 }
@@ -197,4 +207,5 @@ module.exports = {
   getNewLaunchKeys,
   abortLaunchById,
   loadLaunchesData,
+  getLaunchById,
 };
